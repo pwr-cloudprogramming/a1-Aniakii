@@ -1,10 +1,13 @@
-FROM python:3.10-alpine
+FROM node:latest
 
 WORKDIR /app
 
-COPY src/ .
+COPY package*.json .
 
-RUN requirements.txt
+RUN npm install
 
-ENTRYPOINT ["python3"]
-CMD ["app.py"]
+COPY . .
+
+EXPOSE 8080
+
+CMD ["node", "server.js"]

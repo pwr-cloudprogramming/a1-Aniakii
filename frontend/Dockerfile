@@ -1,10 +1,19 @@
-FROM busybox:1.35
+FROM node:latest AS build
 
-RUN adduser -D stud
-USER stud
-WORKDIR /home/stud
+WORKDIR /app
 
-COPY src/ .
+COPY package*.json ./
 
-ENTRYPOINT ["busybox"]
-CMD ["httpd", "-f", "-v", "-p", "3000"]
+RUN npm install
+
+COPY . .
+
+RUN npm run build
+
+FROM nginx:alpine
+
+COPY --from=build /app/build /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
