@@ -12,7 +12,7 @@ const wss = new WebSocket.Server({
 
 let players = [];
 
-app.use(express.static('../frontend/src'));
+app.use(express.static('../../frontend/src'));
 
 wss.on('connection', (ws) => {
   console.log('Client connected');
@@ -86,7 +86,7 @@ function createGame() {
 }
 
 app.get('/game', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/src', 'game.html'));
+    res.sendFile(path.join(__dirname, '../../frontend/src', 'game.html'));
   });
   
 
