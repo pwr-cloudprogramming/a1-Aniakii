@@ -8,5 +8,5 @@ INTERFACE=`curl -H "$TOKEN_HEADER" -s $METADATA_URL/network/interfaces/macs/ | h
 SUBNET_ID=`curl -H "$TOKEN_HEADER" -s $METADATA_URL/network/interfaces/macs/${INTERFACE}/subnet-id`
 VPC_ID=`curl -H "$TOKEN_HEADER" -s $METADATA_URL/network/interfaces/macs/${INTERFACE}/vpc-id`
 echo "${IP_V4}"
-sed -i "s/<EC2_IP>/${IP_V4}/g" /ornitolog/backend/src/frontend/game.js
-sed -i "s/<EC2_IP>/${IP_V4}/g" /ornitolog/backend/src/frontend/start.js
+sed -i "s/<EC2_IP>/${IP_V4}/g" /a1-Aniakii/backend/src/frontend/game.js
+sed -i "s/<EC2_IP>/${IP_V4}/g" /a1-Aniakii/backend/src/frontend/start.js
