@@ -1,17 +1,21 @@
-const ws = new WebSocket('ws://localhost:3000');
+const ws = new WebSocket('ws://<EC2_IP>:8080');
 
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
-const gameObjectString = urlParams.get('game');
-const clientsName = urlParams.get('player');
+const gameObjectString = urlParams.get("game");
+const clientsName = urlParams.get("player");
 const gameObject = JSON.parse(gameObjectString);
 
-const player = gameObject["p1"]["name"] === clientsName ? gameObject["p1"] : gameObject["p2"]
-const opponent = gameObject["p1"]["name"] !== clientsName ? gameObject["p1"] : gameObject["p2"]
+const player =
+  gameObject["p1"]["name"] === clientsName
+    ? gameObject["p1"]
+    : gameObject["p2"];
+const opponent =
+  gameObject["p1"]["name"] !== clientsName
+    ? gameObject["p1"]
+    : gameObject["p2"];
 
 let turn = player["value"] === "X" ? player : opponent;
-
-
 
 const tiles = document.querySelectorAll(".tile");
 
@@ -25,32 +29,29 @@ const gameOverArea = document.getElementById("game-over-area");
 const gameOverText = document.getElementById("game-over-text");
 const playAgain = document.getElementById("play-again");
 
-players1Name.innerText = `You:  ${player["name"]}`
-players2Name.innerText = `Opponent:  ${opponent["name"]}`
+players1Name.innerText = `You:  ${player["name"]}`;
+players2Name.innerText = `Opponent:  ${opponent["name"]}`;
 boardState.fill(null);
 tiles.forEach((tile) => tile.addEventListener("click", tileClick));
 setHoverText();
 
-
 ws.onmessage = (event) => {
-    const message = JSON.parse(event.data);
-    if (message.type === 'turnGame') {
+  const message = JSON.parse(event.data);
+  if (message.type === "turnGame") {
+    const content = JSON.parse(message.content);
 
-        const content = JSON.parse(message.content)
+    const tileNumber = content["tile"];
+    const value = content["value"];
 
-        const tileNumber = content["tile"];
-        const value = content["value"];
+    const tile = document.querySelector(`[data-index="${tileNumber}"]`);
+    tile.innerText = value;
+    boardState[tileNumber - 1] = value;
+    turn = player["value"] === value ? opponent : player;
 
-        const tile = document.querySelector(`[data-index="${tileNumber}"]`);
-        tile.innerText = value;
-        boardState[tileNumber - 1] = value;
-        turn = player["value"] === value ? opponent : player;
-
-        setHoverText();
-        checkWinner();
-    }
-  };
-
+    setHoverText();
+    checkWinner();
+  }
+};
 
 function startNewGame() {
   strike.className = "strike";
@@ -61,18 +62,15 @@ function startNewGame() {
   setHoverText();
 }
 
-
-
 function setHoverText() {
-
   tiles.forEach((tile) => {
     tile.classList.remove("x-hover");
     tile.classList.remove("o-hover");
   });
 
-  if (gameOverArea.classList.contains("visible") || turn == opponent){
-            return;
-        }
+  if (gameOverArea.classList.contains("visible") || turn == opponent) {
+    return;
+  }
   const hoverClass = `${turn["value"].toLowerCase()}-hover`;
 
   tiles.forEach((tile) => {
@@ -83,7 +81,6 @@ function setHoverText() {
 }
 
 function tileClick(event) {
-
   if (gameOverArea.classList.contains("visible") || turn == opponent) {
     return;
   }
@@ -94,21 +91,17 @@ function tileClick(event) {
     return;
   }
 
-    const message = {
-        type: "turn",
-        content: JSON.stringify({'tile': tileNumber, 'value': turn["value"]})
-      };
-      ws.send(JSON.stringify(message));
+  const message = {
+    type: "turn",
+    content: JSON.stringify({ tile: tileNumber, value: turn["value"] }),
+  };
+  ws.send(JSON.stringify(message));
 }
 
-function updateState() {
-   
-}
+function updateState() {}
 
 function checkWinner() {
-
   for (const winningCombination of winningCombinations) {
-    
     const { combo, strikeClass } = winningCombination;
     const tileValue1 = boardState[combo[0] - 1];
     const tileValue2 = boardState[combo[1] - 1];
@@ -120,13 +113,12 @@ function checkWinner() {
       tileValue1 === tileValue3
     ) {
       strike.classList.add(strikeClass);
-      if (tileValue1 === "X")
-      {
+      if (tileValue1 === "X") {
         gameOverScreen("X");
       } else {
         gameOverScreen("Y");
       }
-      
+
       return;
     }
   }
@@ -140,8 +132,7 @@ function checkWinner() {
 function gameOverScreen(winnerText) {
   let text = "Draw!";
   if (winnerText != null) {
-    if (winnerText === player["value"])
-    {
+    if (winnerText === player["value"]) {
       text = `You won, congrats!`;
     } else {
       text = `You lost! :(`;
@@ -151,8 +142,6 @@ function gameOverScreen(winnerText) {
   gameOverText.innerText = text;
   playAgain.addEventListener("click", startNewGame);
 }
-
-
 
 const winningCombinations = [
   //rows
